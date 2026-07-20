@@ -14,7 +14,8 @@ Key refs:
 - `01-product-brief.md` — goal, non-goals
 - `02-attendance-rules.md` — codes `0–4`, late windows
 - `04-session-lifecycle.md` — open/close + tripod station check-in
-- `06-stack.md` — Next.js + Prisma; cloud host target
+- `06-stack.md` — Next.js + Prisma PostgreSQL; presentpo.com
+- `docs/deploy-presentpo.md` — Cloudflare + Railway deploy
 - `10-classroom-runbook.md` — public URL + tripod station
 - `11-anti-cheat-and-identity.md` — teacher-scan + no student passwords
 - `13-screen-flow.md` — allowed screens

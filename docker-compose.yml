@@ -1,16 +1,36 @@
 services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: presentpo
+      POSTGRES_PASSWORD: presentpo
+      POSTGRES_DB: presentpo
+    ports:
+      - "5432:5432"
+    volumes:
+      - presentpo_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U presentpo -d presentpo"]
+      interval: 3s
+      timeout: 5s
+      retries: 10
+
   app:
     build: .
     ports:
       - "3000:3000"
     environment:
-      DATABASE_URL: file:/app/data/dev.db
+      DATABASE_URL: postgresql://presentpo:presentpo@db:5432/presentpo?schema=public
       TEACHER_PIN: ${TEACHER_PIN:-1234}
-      QR_ROTATE_SECONDS: ${QR_ROTATE_SECONDS:-20}
       EARLY_CHECKIN_MINUTES: ${EARLY_CHECKIN_MINUTES:-15}
+      PUBLIC_APP_URL: ${PUBLIC_APP_URL:-http://localhost:3000}
       TZ: Asia/Manila
       HOSTNAME: "0.0.0.0"
       PORT: "3000"
-    volumes:
-      - ./data:/app/data
+    depends_on:
+      db:
+        condition: service_healthy
     restart: unless-stopped
+
+volumes:
+  presentpo_pg:

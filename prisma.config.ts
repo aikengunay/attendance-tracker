@@ -7,6 +7,8 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    url: process.env["DATABASE_URL"] ?? "file:./data/dev.db",
+    url:
+      process.env["DATABASE_URL"] ??
+      "postgresql://presentpo:presentpo@127.0.0.1:5432/presentpo?schema=public",
   },
 });

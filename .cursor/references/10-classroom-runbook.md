@@ -1,6 +1,6 @@
 # Classroom runbook — public URL + tripod station
 
-v0.2 runtime: app on **public HTTPS** (domain + Cloudflare). **No teacher AP**, no LAN IP on the board, no mkcert on student phones. Internet required.
+v0.2 runtime: app on **public HTTPS** at **`https://presentpo.com`** (Cloudflare). **No teacher AP**, no LAN IP on the board, no mkcert on student phones. Internet required.
 
 ## Gear
 
@@ -19,7 +19,7 @@ v0.2 runtime: app on **public HTTPS** (domain + Cloudflare). **No teacher AP**, 
 
 ## Class start (~2 minutes)
 
-1. Board (optional): short URL `https://<domain>/join` (or QR to that URL — **entry** QR, not check-in token).
+1. Board (optional): short URL `https://presentpo.com/join` (or QR to that URL — **entry** QR, not check-in token).
 2. Teacher laptop: log in → section → **Start session**.
 3. Teacher phone (tripod): open **Station Scan** for that session; leave screen on; camera facing table.
 4. Optional: presence board on second display.

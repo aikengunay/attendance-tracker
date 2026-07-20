@@ -25,7 +25,8 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     "/**": [
       "./lib/generated/**/*",
-      "./node_modules/better-sqlite3/**/*",
+      "./node_modules/pg/**/*",
+      "./node_modules/@prisma/adapter-pg/**/*",
       "./prisma/**/*",
       "./.cursor/references/complete-attendance-tracker/**/*",
     ],

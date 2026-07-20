@@ -7,7 +7,7 @@ todos:
     status: completed
   - id: p1-cloud-host
     content: "P1: Domain + Cloudflare HTTPS; migrate off laptop-only SQLite to cloud DB; env/deploy docs; drop AP as runtime dependency"
-    status: pending
+    status: in_progress
   - id: p2-teacher-verify-checkin
     content: "P2: Student personal QR + teacher continuous Scan (tripod); remove projector self-scan + student board camera; source=teacher_scan"
     status: pending
@@ -36,7 +36,7 @@ isProject: true
 
 Synced with Cursor plan `attendance_tracker_v0.2_df7c3cc1`.
 
-**Locks:** Public HTTPS (Cloudflare + domain); internet required; no classroom AP/offline; tripod teacher-scan of student personal QR.
+**Locks:** Public HTTPS at **`https://presentpo.com`** (Cloudflare); internet required; no classroom AP/offline; tripod teacher-scan of student personal QR.
 
 ## Target
 
