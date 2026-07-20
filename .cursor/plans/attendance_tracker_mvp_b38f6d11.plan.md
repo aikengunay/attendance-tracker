@@ -18,8 +18,8 @@ todos:
     content: "M5: live roster/feed; manual mark+override+note; commit+push"
     status: completed
   - id: m6-export-polish
-    content: "M6: xlsx export; projector/TTS/mobile polish; README AP+Docker runbook; commit+push"
-    status: pending
+    content: "M6: fill complete-attendance-tracker xlsx; projector/TTS/mobile polish; README AP+Docker; commit+push"
+    status: completed
   - id: m7-dryrun-tag
     content: "M7: INF231/INF232 dry-run smoke; fix blockers; final push (optional tag v0.1.0-mvp)"
     status: pending

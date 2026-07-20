@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
       "./lib/generated/**/*",
       "./node_modules/better-sqlite3/**/*",
       "./prisma/**/*",
+      "./.cursor/references/complete-attendance-tracker/**/*",
     ],
   },
 };

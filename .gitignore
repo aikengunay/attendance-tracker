@@ -9,6 +9,7 @@ dist/
 *.db-journal
 data/
 .DS_Store
+**/.DS_Store
 coverage/
 prisma/*.db
 prisma/*.db-journal

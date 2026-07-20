@@ -1,30 +1,45 @@
 # Excel export compatibility
 
-Existing workbooks live in `teaching/attendance/`:
+Canonical gradebook templates live in:
 
-- `attendance-inf231.xlsx`
-- `attendance-inf232.xlsx`
-- `attendance-template.xlsx`
+`.cursor/references/complete-attendance-tracker/`
+
+- `attendance-inf231.xlsx` — INF231MWA
+- `attendance-inf232.xlsx` — INF232MWA
+- `attendance-template.xlsx` — fallback for other section codes
 
 Sheets: `midterms` (weeks 1–7), `finals` (weeks 8–14), `all` (rollup), `summary` (analytics).
 
-## MVP export (keep simple)
+Also mirrored historically under `teaching/attendance/` outside this repo.
 
-Produce a flat export the teacher can copy from:
+## MVP export (implemented)
 
-| studentId | studentName | date | weekday | code | source | checkedInAt |
-|-----------|-------------|------|---------|------|--------|-------------|
+**Primary download = filled gradebook template** (same format as the perfect attendance workbooks).
 
-Plus a **pivot-friendly** sheet: rows = students (roster order), columns = meeting dates, values = `0–4` or blank.
+Flow:
+
+1. Clone the section’s template xlsx.
+2. Clear prior mark cells on `midterms` / `finals` date columns (C–P).
+3. For each **opened** session, map calendar date → column header (`Wednesday, July 15, 2026` style).
+4. Match students by **normalized name** (column B on `midterms`).
+5. Write codes `0–4` only; leave `all` / `summary` formulas untouched.
+6. Unopened dates stay **blank** (not `0`).
+7. Unmatched names/dates are listed on an `_export_notes` sheet.
+
+API: `GET /api/sections/[sectionId]/export`  
+UI: `/teacher/sections/[sectionId]/export`
+
+Filename: `attendance-{SECTION}-{YYYYMMDD}.xlsx`
 
 ## Mapping rules
 
-- Only export meetings that were **opened** (or manually marked).
-- Unopened dates → blank (not `0`).
-- Codes must be numeric `0–4`.
-- Roster order: follow imported classlist order (teacher may reorder later in Excel).
-- Section file naming: `attendance-export-INF231MWA-YYYYMMDD.xlsx`
+- Only meetings with a Session are exported.
+- Multiple sessions on the same date: latest mark wins.
+- Roster order follows the template (not re-sorted by the app).
+- Late adds present in the app but missing from the xlsx → `_export_notes` (not silent drop without notice).
 
-## Later (Phase 3)
+## Out of scope (for now)
 
-Write directly into `midterms` / `finals` date columns by matching date headers (`Wednesday, July 22, 2026` style).
+- Rewriting `summary` logic in the app
+- Matching by Student ID column (templates are name-keyed today)
+- Auto-appending new student rows with full formula plumbing

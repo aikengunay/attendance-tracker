@@ -42,6 +42,8 @@ COPY --from=builder /app/node_modules/better-sqlite3 ./node_modules/better-sqlit
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
 COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/.cursor/references/complete-attendance-tracker ./.cursor/references/complete-attendance-tracker
+COPY --from=builder /app/node_modules/exceljs ./node_modules/exceljs
 COPY docker/entrypoint.sh ./entrypoint.sh
 
 RUN chmod +x ./entrypoint.sh \

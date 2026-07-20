@@ -51,9 +51,19 @@ export default async function SectionDetailPage({ params }: Props) {
           <span className="mx-1">/</span>
           {section.code}
         </p>
-        <h1 className="mt-2 text-2xl font-semibold tracking-tight">{section.code}</h1>
-        <p className="text-sm text-zinc-600">{section.subjectName}</p>
-        <p className="text-xs text-zinc-500">{section.termLabel}</p>
+        <div className="mt-2 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight">{section.code}</h1>
+            <p className="text-sm text-zinc-600">{section.subjectName}</p>
+            <p className="text-xs text-zinc-500">{section.termLabel}</p>
+          </div>
+          <Link
+            href={`/teacher/sections/${section.id}/export`}
+            className="rounded border border-zinc-300 bg-white px-3 py-2 text-sm font-medium"
+          >
+            Export gradebook
+          </Link>
+        </div>
       </div>
 
       <section className="flex flex-col gap-2">
