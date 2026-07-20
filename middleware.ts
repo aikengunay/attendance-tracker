@@ -21,7 +21,8 @@ export async function middleware(req: NextRequest) {
     pathname.startsWith("/teacher") ||
     pathname.startsWith("/api/teacher") ||
     pathname.startsWith("/api/import") ||
-    pathname.startsWith("/api/sections");
+    pathname.startsWith("/api/sections") ||
+    pathname.startsWith("/api/sessions");
 
   if (!needsTeacher) {
     return NextResponse.next();
@@ -55,5 +56,6 @@ export const config = {
     "/api/teacher/:path*",
     "/api/import/:path*",
     "/api/sections/:path*",
+    "/api/sessions/:path*",
   ],
 };

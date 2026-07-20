@@ -1,4 +1,5 @@
 import { AddStudentForm } from "@/components/AddStudentForm";
+import { StartSessionPanel } from "@/components/StartSessionPanel";
 import { prisma } from "@/lib/db";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -16,10 +17,29 @@ export default async function SectionDetailPage({ params }: Props) {
     include: {
       templates: { orderBy: [{ dayOfWeek: "asc" }, { startTime: "asc" }] },
       students: { where: { active: true }, orderBy: { name: "asc" } },
+      meetings: {
+        orderBy: { startAt: "desc" },
+        take: 10,
+        include: { session: true },
+      },
     },
   });
 
   if (!section) notFound();
+
+  const openSession = await prisma.session.findFirst({
+    where: { status: "open", meeting: { sectionId } },
+    select: { id: true },
+  });
+
+  const templates = section.templates.map((t) => ({
+    id: t.id,
+    dayLabel: DAY_LABELS[t.dayOfWeek] ?? String(t.dayOfWeek),
+    startTime: t.startTime,
+    endTime: t.endTime,
+    roomType: t.roomType,
+    room: t.room,
+  }));
 
   return (
     <main className="flex flex-col gap-8">
@@ -35,6 +55,17 @@ export default async function SectionDetailPage({ params }: Props) {
         <p className="text-sm text-zinc-600">{section.subjectName}</p>
         <p className="text-xs text-zinc-500">{section.termLabel}</p>
       </div>
+
+      <section className="flex flex-col gap-2">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
+          Session
+        </h2>
+        <StartSessionPanel
+          sectionId={section.id}
+          templates={templates}
+          openSessionId={openSession?.id ?? null}
+        />
+      </section>
 
       <section className="flex flex-col gap-2">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
@@ -55,17 +86,47 @@ export default async function SectionDetailPage({ params }: Props) {
             <li className="px-4 py-3 text-zinc-500">No schedules imported.</li>
           ) : null}
         </ul>
-        <p className="text-xs text-zinc-500">
-          Session start/QR lands in the next milestone.
-        </p>
       </section>
 
-      <section className="flex flex-col gap-3">
-        <div className="flex items-end justify-between gap-4">
+      {section.meetings.length > 0 ? (
+        <section className="flex flex-col gap-2">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
-            Roster ({section.students.length})
+            Recent meetings
           </h2>
-        </div>
+          <ul className="rounded border border-zinc-200 bg-white text-sm">
+            {section.meetings.map((m) => (
+              <li
+                key={m.id}
+                className="flex items-center justify-between gap-3 border-b border-zinc-100 px-4 py-2 last:border-0"
+              >
+                <span>
+                  {m.startAt.toLocaleString("en-PH", { timeZone: "Asia/Manila" })}
+                  {m.title ? ` · ${m.title}` : ""}
+                </span>
+                <span className="text-zinc-600">
+                  {m.session?.status ?? "no session"}
+                  {m.session?.status === "open" ? (
+                    <>
+                      {" · "}
+                      <Link
+                        href={`/teacher/sessions/${m.session.id}/projector`}
+                        className="underline"
+                      >
+                        projector
+                      </Link>
+                    </>
+                  ) : null}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      <section className="flex flex-col gap-3">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
+          Roster ({section.students.length})
+        </h2>
         <div className="overflow-x-auto rounded border border-zinc-200 bg-white">
           <table className="min-w-full text-left text-sm">
             <thead className="border-b border-zinc-200 bg-zinc-50 text-xs uppercase tracking-wide text-zinc-500">

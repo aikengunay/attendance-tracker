@@ -13,7 +13,7 @@ todos:
     status: completed
   - id: m4-session-qr-checkin
     content: "M4: session start/end; rotating QR; student join+check-in; scoring; auto-absent 0; commit+push"
-    status: pending
+    status: completed
   - id: m5-feed-overrides
     content: "M5: live roster/feed; manual mark+override+note; commit+push"
     status: pending

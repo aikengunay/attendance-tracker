@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { afterAll, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { prisma } from "@/lib/db";
 import { parseClasslistBuffer } from "./classlist";
 import { commitClasslist } from "./commit";
@@ -25,6 +25,7 @@ describe("commitClasslist", () => {
     expect(s232.studentCount).toBe(22);
 
     const counts = await prisma.section.findMany({
+      where: { code: { in: ["INF231MWA", "INF232MWA"] } },
       orderBy: { code: "asc" },
       include: { _count: { select: { students: true, templates: true } } },
     });
@@ -35,6 +36,3 @@ describe("commitClasslist", () => {
   });
 });
 
-afterAll(async () => {
-  await prisma.$disconnect();
-});

@@ -6,7 +6,7 @@ Built for CTADWEBL sections (INF231 / INF232) and designed to export into the ex
 
 ## Status
 
-**M3** — Teacher PIN, classlist import, sections + roster. Session/QR check-in is next.
+**M4** — Session start/end, rotating QR projector, student check-in, auto-absent `0`.
 
 ## Quick start (local)
 
