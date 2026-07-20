@@ -105,15 +105,26 @@ export default async function SectionDetailPage({ params }: Props) {
                 </span>
                 <span className="text-zinc-600">
                   {m.session?.status ?? "no session"}
-                  {m.session?.status === "open" ? (
+                  {m.session ? (
                     <>
                       {" · "}
                       <Link
-                        href={`/teacher/sessions/${m.session.id}/projector`}
+                        href={`/teacher/sessions/${m.session.id}/roster`}
                         className="underline"
                       >
-                        projector
+                        roster
                       </Link>
+                      {m.session.status === "open" ? (
+                        <>
+                          {" · "}
+                          <Link
+                            href={`/teacher/sessions/${m.session.id}/projector`}
+                            className="underline"
+                          >
+                            projector
+                          </Link>
+                        </>
+                      ) : null}
                     </>
                   ) : null}
                 </span>

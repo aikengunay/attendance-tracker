@@ -14,24 +14,50 @@ type QrPayload = {
   counts: { checkedIn: number; roster: number };
 };
 
+type FeedLatest = {
+  name: string;
+  code: number;
+  source: string;
+} | null;
+
 export function ProjectorClient({ sessionId }: { sessionId: string }) {
   const router = useRouter();
   const [data, setData] = useState<QrPayload | null>(null);
+  const [latest, setLatest] = useState<FeedLatest>(null);
   const [error, setError] = useState<string | null>(null);
   const [ending, setEnding] = useState(false);
 
   const poll = useCallback(async () => {
     try {
-      const res = await fetch(`/api/sessions/${sessionId}/qr`, {
-        cache: "no-store",
-      });
-      const json = await res.json();
-      if (!res.ok) {
-        setError(json.message || "QR unavailable");
+      const [qrRes, feedRes] = await Promise.all([
+        fetch(`/api/sessions/${sessionId}/qr`, { cache: "no-store" }),
+        fetch(`/api/sessions/${sessionId}/feed`, { cache: "no-store" }),
+      ]);
+      const qrJson = await qrRes.json();
+      if (!qrRes.ok) {
+        setError(qrJson.message || "QR unavailable");
         return;
       }
       setError(null);
-      setData(json);
+      setData(qrJson);
+
+      if (feedRes.ok) {
+        const feedJson = await feedRes.json();
+        setLatest(feedJson.latest ?? null);
+        if (feedJson.counts) {
+          setData((d) =>
+            d
+              ? {
+                  ...d,
+                  counts: {
+                    checkedIn: feedJson.counts.checkedIn,
+                    roster: feedJson.counts.roster,
+                  },
+                }
+              : d,
+          );
+        }
+      }
     } catch {
       setError("Network error");
     }
@@ -46,9 +72,11 @@ export function ProjectorClient({ sessionId }: { sessionId: string }) {
   async function endSession() {
     setEnding(true);
     try {
-      const res = await fetch(`/api/sessions/${sessionId}/end`, { method: "POST" });
+      const res = await fetch(`/api/sessions/${sessionId}/end`, {
+        method: "POST",
+      });
       if (res.ok) {
-        router.push("/teacher");
+        router.push(`/teacher/sessions/${sessionId}/roster`);
         router.refresh();
       }
     } finally {
@@ -67,10 +95,10 @@ export function ProjectorClient({ sessionId }: { sessionId: string }) {
         </div>
         <div className="flex gap-2">
           <Link
-            href="/teacher"
+            href={`/teacher/sessions/${sessionId}/roster`}
             className="rounded border border-zinc-300 px-3 py-1.5 text-sm"
           >
-            Back
+            Roster
           </Link>
           <button
             type="button"
@@ -83,14 +111,24 @@ export function ProjectorClient({ sessionId }: { sessionId: string }) {
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col items-center justify-center gap-6 px-4">
+      <div className="flex flex-1 flex-col items-center justify-center gap-5 px-4">
         {error ? <p className="text-red-600">{error}</p> : null}
+        {latest ? (
+          <p className="max-w-3xl text-center text-3xl font-semibold tracking-tight sm:text-4xl">
+            {latest.name}
+            <span className="ml-3 text-xl font-normal text-zinc-500">
+              code {latest.code}
+            </span>
+          </p>
+        ) : (
+          <p className="text-lg text-zinc-400">Waiting for check-ins…</p>
+        )}
         {data?.qrDataUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={data.qrDataUrl}
             alt="Check-in QR"
-            className="h-[min(70vw,420px)] w-[min(70vw,420px)]"
+            className="h-[min(60vw,360px)] w-[min(60vw,360px)]"
           />
         ) : (
           <p className="text-zinc-500">Loading QR…</p>
@@ -100,10 +138,9 @@ export function ProjectorClient({ sessionId }: { sessionId: string }) {
         </p>
         <p className="text-center text-sm text-zinc-600">
           Fallback code:{" "}
-          <span className="font-mono text-lg text-zinc-900">{data?.token ?? "—"}</span>
-        </p>
-        <p className="max-w-lg break-all text-center text-xs text-zinc-400">
-          {data?.checkInUrl}
+          <span className="font-mono text-lg text-zinc-900">
+            {data?.token ?? "—"}
+          </span>
         </p>
       </div>
     </div>

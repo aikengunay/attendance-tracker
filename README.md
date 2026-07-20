@@ -6,7 +6,7 @@ Built for CTADWEBL sections (INF231 / INF232) and designed to export into the ex
 
 ## Status
 
-**M4** — Session start/end, rotating QR projector, student check-in, auto-absent `0`.
+**M5** — Live roster/feed, manual overrides with notes, projector latest name.
 
 ## Quick start (local)
 

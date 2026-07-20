@@ -87,6 +87,12 @@ export function StartSessionPanel({
           >
             Open projector QR
           </a>
+          <a
+            href={`/teacher/sessions/${openSessionId}/roster`}
+            className="rounded border border-zinc-300 bg-white px-3 py-2 text-sm font-medium"
+          >
+            Live roster
+          </a>
           <button
             type="button"
             onClick={onEnd}

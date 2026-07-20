@@ -16,7 +16,7 @@ todos:
     status: completed
   - id: m5-feed-overrides
     content: "M5: live roster/feed; manual mark+override+note; commit+push"
-    status: pending
+    status: completed
   - id: m6-export-polish
     content: "M6: xlsx export; projector/TTS/mobile polish; README AP+Docker runbook; commit+push"
     status: pending
