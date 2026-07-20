@@ -33,10 +33,22 @@ For the **2-day / local MVP** test. App runs on the teacher laptop; students joi
 
 ## During class
 
-- Students join AP → open site → identify → scan rotating QR
+- Students join AP → open site → **Open camera** (in-app) or use phone Camera on the projector QR → enter Student ID → confirm
+- Typed **fallback code** under the projector QR still works if camera scan fails
 - Live feed shows each successful check-in (see announcement feature)
 - Late arrivals keep scanning; codes auto-map to `1–4`
 - Dead phone / can’t scan → teacher **manual mark** later or quietly
+
+### In-app camera on classroom HTTP (important)
+
+Browsers treat `http://<LAN-IP>:3000` as a **non-secure context**. Many phones (especially **iOS Safari**) block `getUserMedia` there, so **Open camera** on `/join` may fail with a clear caption.
+
+**What still works on HTTP LAN:**
+
+1. Phone **Camera** app → scan projector QR → opens `/join?token=&sectionCode=`
+2. Type section + Student ID + the **fallback code** shown under the QR
+
+**When in-app scan works:** `http://localhost` on the laptop, or any **HTTPS** host. Trusted local HTTPS / production host can be added later if you want in-app scan on every student phone over the AP.
 
 ## Class end (1 minute)
 
@@ -49,6 +61,7 @@ For the **2-day / local MVP** test. App runs on the teacher laptop; students joi
 | Symptom | Fix |
 |---------|-----|
 | Phones can’t open URL | Same SSID? Isolation off? Correct IP? App on `0.0.0.0`? |
+| In-app Open camera fails | Expected on many phones over HTTP LAN — use OS Camera or typed fallback code |
 | QR says expired | Normal if slow; wait for next rotate and rescan |
 | Already checked in | One check-in per student; use override if needed |
 | Laptop sleeps | Disable sleep while session is open |

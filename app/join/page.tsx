@@ -1,4 +1,5 @@
 import { checkInAction, lookupStudentAction } from "@/app/join/actions";
+import { JoinQrScanner } from "@/app/join/join-qr-scanner";
 
 type Props = {
   searchParams: Promise<{
@@ -30,8 +31,9 @@ export default async function JoinPage({ searchParams }: Props) {
           Check in
         </h1>
         <p className="mt-2 text-sm leading-6 text-zinc-600">
-          Scan the projector QR with your phone Camera, or enter section + ID
-          and the fallback code under the QR.
+          Scan the projector QR in this page or with your phone Camera, then
+          confirm your student ID. You can also type section + ID and the
+          fallback code under the QR.
         </p>
       </div>
 
@@ -42,42 +44,50 @@ export default async function JoinPage({ searchParams }: Props) {
       ) : null}
 
       {step === "identify" ? (
-        <form action={lookupStudentAction} className="flex flex-col gap-4">
-          <input type="hidden" name="token" value={token} />
-          <label className="flex flex-col gap-1.5 text-sm">
-            <span className="text-zinc-600">Section</span>
-            <input
-              name="sectionCode"
-              defaultValue={sectionCode}
-              placeholder="INF191"
-              autoCapitalize="characters"
-              autoCorrect="off"
-              spellCheck={false}
-              required
-              className="min-h-12 rounded-lg border border-zinc-300 bg-white px-3 text-base text-zinc-900"
-            />
-          </label>
-          <label className="flex flex-col gap-1.5 text-sm">
-            <span className="text-zinc-600">Student ID</span>
-            <input
-              name="studentId"
-              defaultValue={studentId}
-              placeholder="2019-100265"
-              inputMode="text"
-              autoComplete="off"
-              autoCorrect="off"
-              spellCheck={false}
-              required
-              className="min-h-12 rounded-lg border border-zinc-300 bg-white px-3 font-mono text-base text-zinc-900"
-            />
-          </label>
-          <button
-            type="submit"
-            className="min-h-12 rounded-lg bg-zinc-900 px-4 text-base font-medium text-white"
-          >
-            Find me
-          </button>
-        </form>
+        <div className="flex flex-col gap-4">
+          <JoinQrScanner sectionCode={sectionCode} studentId={studentId} />
+          <form action={lookupStudentAction} className="flex flex-col gap-4">
+            <input type="hidden" name="token" value={token} />
+            <label className="flex flex-col gap-1.5 text-sm">
+              <span className="text-zinc-600">Section</span>
+              <input
+                name="sectionCode"
+                defaultValue={sectionCode}
+                placeholder="INF191"
+                autoCapitalize="characters"
+                autoCorrect="off"
+                spellCheck={false}
+                required
+                className="min-h-12 rounded-lg border border-zinc-300 bg-white px-3 text-base text-zinc-900"
+              />
+            </label>
+            <label className="flex flex-col gap-1.5 text-sm">
+              <span className="text-zinc-600">Student ID</span>
+              <input
+                name="studentId"
+                defaultValue={studentId}
+                placeholder="2019-100265"
+                inputMode="text"
+                autoComplete="off"
+                autoCorrect="off"
+                spellCheck={false}
+                required
+                className="min-h-12 rounded-lg border border-zinc-300 bg-white px-3 font-mono text-base text-zinc-900"
+              />
+            </label>
+            {token ? (
+              <p className="text-sm text-zinc-500">
+                QR token ready from scan. Enter your ID and tap Find me.
+              </p>
+            ) : null}
+            <button
+              type="submit"
+              className="min-h-12 rounded-lg bg-zinc-900 px-4 text-base font-medium text-white"
+            >
+              Find me
+            </button>
+          </form>
+        </div>
       ) : (
         <form action={checkInAction} className="flex flex-col gap-4">
           <input type="hidden" name="sectionCode" value={sectionCode} />
@@ -95,16 +105,24 @@ export default async function JoinPage({ searchParams }: Props) {
               <p className="text-sm text-zinc-500">QR token ready from scan.</p>
             </>
           ) : (
-            <label className="flex flex-col gap-1.5 text-sm">
-              <span className="text-zinc-600">Projector fallback code</span>
-              <input
-                name="token"
-                required
-                autoCorrect="off"
-                spellCheck={false}
-                className="min-h-12 rounded-lg border border-zinc-300 bg-white px-3 font-mono text-base text-zinc-900"
+            <>
+              <JoinQrScanner
+                sectionCode={sectionCode}
+                studentId={studentId}
+                name={name}
+                resumeConfirm
               />
-            </label>
+              <label className="flex flex-col gap-1.5 text-sm">
+                <span className="text-zinc-600">Projector fallback code</span>
+                <input
+                  name="token"
+                  required
+                  autoCorrect="off"
+                  spellCheck={false}
+                  className="min-h-12 rounded-lg border border-zinc-300 bg-white px-3 font-mono text-base text-zinc-900"
+                />
+              </label>
+            </>
           )}
           <div className="flex flex-col gap-2 sm:flex-row">
             <a

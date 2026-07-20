@@ -24,7 +24,7 @@ npm run dev
 
 - App: `http://localhost:3000` on this PC (bound to `0.0.0.0`)
 - Teacher: `/teacher` → PIN → import classlist → start session → projector
-- Student: scan QR or open `/join`
+- Student: open `/join` → **Open camera** (in-app) or phone Camera on projector QR → Student ID → confirm (typed fallback code still works; in-app camera often blocked on HTTP LAN — see classroom runbook)
 - Export: section → **Export gradebook** → filled `midterms`/`finals`/`all`/`summary` workbook
 
 ### Demo section (not a real class)
