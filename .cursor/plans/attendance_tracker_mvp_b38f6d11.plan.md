@@ -22,7 +22,7 @@ todos:
     status: completed
   - id: m7-dryrun-tag
     content: "M7: INF231/INF232 dry-run smoke; fix blockers; final push (optional tag v0.1.0-mvp)"
-    status: pending
+    status: completed
 isProject: false
 ---
 

@@ -7,7 +7,7 @@ Clock starts when implementation begins. Goal: usable in a real or dry-run class
 - [x] Product references written under `.cursor/references/`
 - [x] Cursor rules + stack + phases established
 - [x] Sample classlists in `fixtures/classlists/`
-- [ ] Scaffold Next.js + Prisma + SQLite
+- [x] Scaffold Next.js + Prisma + SQLite
 
 ## Day 1 — Capture path works
 
@@ -31,11 +31,11 @@ Clock starts when implementation begins. Goal: usable in a real or dry-run class
 
 ### Day 1 exit criteria
 
-- [ ] Import both classlists without manual typing
-- [ ] Start INF231 session, show QR
-- [ ] Check in 2–3 test students at different offsets → codes `1/2/3/4`
-- [ ] End session → unchecked students become `0`
-- [ ] Blanks: meetings never opened do not create `0`s
+- [x] Import both classlists without manual typing
+- [x] Start INF231 session, show QR
+- [x] Check in 2–3 test students at different offsets → codes `1/2/3/4`
+- [x] End session → unchecked students become `0`
+- [x] Blanks: meetings never opened do not create `0`s
 
 ## Day 2 — Teachability + export
 
@@ -60,10 +60,10 @@ Clock starts when implementation begins. Goal: usable in a real or dry-run class
 
 ### Day 2 exit criteria
 
-- [ ] Teacher can run a session without touching Excel mid-class
-- [ ] Export opens; codes readable for paste/merge into attendance workbook
-- [ ] Documented runbook: import → start → QR → end → export
-- [ ] Known limitations listed (auth, proxy, hosting)
+- [x] Teacher can run a session without touching Excel mid-class
+- [x] Export opens; codes readable for paste/merge into attendance workbook
+- [x] Documented runbook: import → start → QR → end → export
+- [x] Known limitations listed (auth, proxy, hosting)
 
 ## Phase 3+ (after test — not in 2-day scope)
 

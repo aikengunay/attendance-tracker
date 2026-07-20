@@ -6,7 +6,7 @@ Built for CTADWEBL sections (INF231 / INF232). Export fills the same gradebook w
 
 ## Status
 
-**M6** — Gradebook xlsx export, projector TTS toggle, mobile join polish, classroom Docker/AP runbook.
+**M7 / v0.1.0-mvp** — INF231+INF232 dry-run passed; classroom-ready MVP tagged.
 
 ## Quick start (local)
 
@@ -24,9 +24,12 @@ npm run dev
 - Export: section → **Export gradebook** → filled `midterms`/`finals`/`all`/`summary` workbook
 
 ```bash
-npm test
+npm test                 # includes INF231/INF232 dry-run
 npm run build
+npm run start            # then: npm run smoke:http
 ```
+
+Dry-run notes: [`.cursor/references/16-mvp-dryrun-notes.md`](.cursor/references/16-mvp-dryrun-notes.md).
 
 ## Quick start (Docker / classroom)
 
