@@ -16,7 +16,7 @@ Class day does **not** use a teacher AP or laptop SQLite.
    - Root = this project
    - Build: `npm ci && npx prisma generate && npm run build`
    - Start: `npx prisma migrate deploy && npm run start:http`
-   - Or use the Docker image (`Dockerfile`) if you prefer.
+   - Prefer Nixpacks (default via `railway.toml`). Local Docker image lives at `docker/Dockerfile`.
 4. Set env vars on the service:
 
 | Variable | Value |
