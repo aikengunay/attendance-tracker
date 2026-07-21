@@ -14,8 +14,8 @@ Class day does **not** use a teacher AP or laptop SQLite.
 2. Add **PostgreSQL** plugin → copy the `DATABASE_URL`.
 3. Deploy this repo (GitHub connect or `railway up`):
    - Root = this project
-   - Build: `npm ci && npx prisma generate && npm run build`
-   - Start: `npx prisma migrate deploy && npm run start:http`
+   - Build: `npx prisma migrate deploy && npm run build` (Nixpacks already runs `npm ci`; do not re-run it)
+   - Start: `npm run start`
    - Prefer Nixpacks (default via `railway.toml`). Local Docker image lives at `docker/Dockerfile`.
 4. Set env vars on the service:
 
