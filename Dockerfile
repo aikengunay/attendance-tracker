@@ -40,6 +40,8 @@ COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
 COPY --from=builder /app/node_modules/pg ./node_modules/pg
 COPY --from=builder /app/node_modules/@prisma/adapter-pg ./node_modules/@prisma/adapter-pg
+# prisma CLI shim for entrypoint migrate
+COPY --from=builder /app/node_modules/.bin/prisma ./node_modules/.bin/prisma
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/.cursor/references/complete-attendance-tracker ./.cursor/references/complete-attendance-tracker
 COPY --from=builder /app/node_modules/exceljs ./node_modules/exceljs
