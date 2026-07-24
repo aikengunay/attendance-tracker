@@ -64,8 +64,10 @@ export async function lookupStudentAction(formData: FormData) {
     doneRedirect(already);
   }
 
+  // fresh=1 → always show “Is this you?” (don’t auto-resume a prior QR ticket)
   joinRedirect({
     step: "confirm",
+    fresh: "1",
     sectionCode: student.section.code,
     studentId: student.studentId,
     name: student.name,

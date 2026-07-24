@@ -1,17 +1,16 @@
 "use client";
 
-import { BrandLockup } from "@/components/teacher/brand-lockup";
+import { FluentAnimatedEmoji } from "@/components/FluentAnimatedEmoji";
 import { PulsingQrTile } from "@/components/PulsingQrTile";
 import { TicketReassureLine } from "@/components/TicketReassureLine";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { useConfirmIdentityScale } from "@/hooks/use-confirm-identity-scale";
 import { useResponsiveQrTile } from "@/hooks/use-responsive-qr-size";
+import {
+  CONFIRM_FLUENT_NUDGE,
+  CONFIRM_FLUENT_SRC,
+} from "@/lib/join-ticket-copy";
+import { cn } from "@/lib/utils";
 import {
   clearJoinTicket,
   loadJoinTicket,
@@ -109,18 +108,22 @@ export function JoinConfirmTicket({
   studentId,
   name,
   subjectName,
+  requireConfirm = false,
 }: {
   sectionCode: string;
   studentId: string;
   name: string;
   subjectName: string;
+  /** True after Find me — show confirm; don’t auto-skip to QR from storage. */
+  requireConfirm?: boolean;
 }) {
   const router = useRouter();
   const qrTile = useResponsiveQrTile();
+  const identityScale = useConfirmIdentityScale(name);
   const [ticket, setTicket] = useState<TicketData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [resuming, setResuming] = useState(true);
+  const [resuming, setResuming] = useState(!requireConfirm);
 
   const applyIssuedTicket = useCallback(
     (data: {
@@ -187,9 +190,25 @@ export function JoinConfirmTicket({
     }
   }, [sectionCode, studentId, name, router, applyIssuedTicket]);
 
-  // Resume after refresh once: already-in → done; else re-issue a fresh QR.
+  // After Find me: always show confirm (clear any prior ticket).
+  // After refresh on an existing ticket: restore QR (or done if already scanned).
   useEffect(() => {
     let cancelled = false;
+
+    if (requireConfirm) {
+      clearJoinTicket(sectionCode, studentId);
+      setResuming(false);
+      // Drop fresh=1 so a later refresh can resume the ticket.
+      if (typeof window !== "undefined") {
+        const url = new URL(window.location.href);
+        if (url.searchParams.has("fresh")) {
+          url.searchParams.delete("fresh");
+          window.history.replaceState(null, "", url.pathname + url.search);
+        }
+      }
+      return;
+    }
+
     (async () => {
       const stored = loadJoinTicket(sectionCode, studentId);
       if (!stored?.token) {
@@ -253,7 +272,7 @@ export function JoinConfirmTicket({
     };
     // Mount / identity only — avoid re-issue loops.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sectionCode, studentId]);
+  }, [sectionCode, studentId, requireConfirm]);
 
   useEffect(() => {
     if (!ticket?.token) return;
@@ -338,65 +357,77 @@ export function JoinConfirmTicket({
           </div>
         </div>
 
-        <Button
-          variant="outline"
-          size="lg"
-          className="w-full shrink-0 sm:w-auto sm:self-center sm:px-8"
-          nativeButton={false}
-          render={<Link href="/join" />}
+        <Link
+          href="/join"
+          className="inline-flex min-h-11 shrink-0 items-center justify-center px-4 py-3 text-center text-sm font-medium text-muted-foreground underline-offset-4 hover:text-foreground hover:underline sm:self-center"
         >
           Cancel
-        </Button>
+        </Link>
       </div>
     );
   }
 
   return (
-    <div className="flex w-full max-w-sm flex-col gap-6">
-      <BrandLockup className="self-center" size="lg" />
-      <Card>
-        <CardHeader className="text-center">
-          <CardTitle className="text-xl">Is this you?</CardTitle>
-          <CardDescription>
-            Confirm, then show your QR at the station.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          <div className="rounded-lg border bg-muted/30 p-4 text-center">
-            <p className="text-xl font-medium leading-snug">{name}</p>
-            <p className="mt-1 font-mono text-sm text-muted-foreground">
-              {studentId}
-            </p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {formatSessionWhere(sectionCode, subjectName)}
-            </p>
-          </div>
-          {error ? (
-            <p className="text-sm text-destructive">{error}</p>
-          ) : null}
+    <div className="flex min-h-[calc(100svh-2rem)] w-full max-w-sm flex-col md:min-h-[calc(100svh-5rem)]">
+      <div className="flex flex-1 flex-col items-center justify-center gap-6 py-6">
+        <div
+          className="flex items-center justify-center"
+          style={{
+            transform: `translate(${CONFIRM_FLUENT_NUDGE.x}px, ${CONFIRM_FLUENT_NUDGE.y}px)`,
+          }}
+        >
+          <FluentAnimatedEmoji
+            src={CONFIRM_FLUENT_SRC}
+            size={identityScale.emojiSize}
+            alt=""
+          />
+        </div>
+
+        <h1 className="font-heading text-xl font-medium tracking-tight text-foreground/80 sm:text-2xl">
+          Is this you?
+        </h1>
+
+        <div className="w-full max-w-full space-y-2 px-1 text-center">
+          <p
+            className={cn(
+              "mx-auto max-w-full font-semibold uppercase leading-snug tracking-wide break-words hyphens-none",
+              identityScale.nameClass,
+            )}
+          >
+            {name}
+          </p>
+          <p
+            className={cn(
+              "font-mono text-muted-foreground",
+              identityScale.idClass,
+            )}
+          >
+            {studentId}
+          </p>
+        </div>
+
+        {error ? (
+          <p className="text-center text-sm text-destructive">{error}</p>
+        ) : null}
+
+        <div className="flex w-full flex-col items-center gap-1 pt-2">
           <Button
-            size="lg"
+            variant="chunky"
+            size="xl"
             className="w-full"
             disabled={busy}
             onClick={() => void issueTicket()}
           >
             {busy ? "Preparing…" : "This is me"}
           </Button>
-          <Button
-            variant="outline"
-            size="lg"
-            className="w-full"
-            nativeButton={false}
-            render={
-              <Link
-                href={`/join?sectionCode=${encodeURIComponent(sectionCode)}&studentId=${encodeURIComponent(studentId)}`}
-              />
-            }
+          <Link
+            href={`/join?sectionCode=${encodeURIComponent(sectionCode)}&studentId=${encodeURIComponent(studentId)}`}
+            className="inline-flex min-h-11 items-center justify-center px-4 py-3 text-sm font-medium text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
           >
             Not me
-          </Button>
-        </CardContent>
-      </Card>
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

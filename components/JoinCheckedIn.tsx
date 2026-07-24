@@ -103,8 +103,9 @@ export function JoinCheckedIn({
       </div>
 
       <Button
-        size="lg"
-        className="w-full shrink-0 sm:w-auto sm:self-center sm:px-8"
+        variant="chunky"
+        size="xl"
+        className="w-full shrink-0 sm:w-auto sm:self-center sm:px-10"
         nativeButton={false}
         render={<Link href="/" />}
       >
