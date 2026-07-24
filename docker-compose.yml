@@ -1,3 +1,4 @@
+# Local Postgres only. App runs via `npm run dev` / Railway (Nixpacks).
 services:
   db:
     image: postgres:16-alpine
@@ -14,25 +15,6 @@ services:
       interval: 3s
       timeout: 5s
       retries: 10
-
-  app:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile
-    ports:
-      - "3000:3000"
-    environment:
-      DATABASE_URL: postgresql://presentpo:presentpo@db:5432/presentpo?schema=public
-      TEACHER_PASSWORD: ${TEACHER_PASSWORD:-1234}
-      EARLY_CHECKIN_MINUTES: ${EARLY_CHECKIN_MINUTES:-15}
-      PUBLIC_APP_URL: ${PUBLIC_APP_URL:-http://localhost:3000}
-      TZ: Asia/Manila
-      HOSTNAME: "0.0.0.0"
-      PORT: "3000"
-    depends_on:
-      db:
-        condition: service_healthy
-    restart: unless-stopped
 
 volumes:
   presentpo_pg:

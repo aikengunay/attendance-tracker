@@ -29,7 +29,7 @@ npm run smoke:http
 
 See `10-classroom-runbook.md`. Checklist:
 
-1. `docker compose up --build` or `npm run start` on `0.0.0.0:3000`
+1. `docker compose up -d db` then `npm run dev` (or production: `https://presentpo.com`)
 2. Laptop + phone on teacher AP reach `http://<LAN-IP>:3000`
 3. Import both classlists once
 4. Start INF231 → projector QR → 2–3 phone check-ins

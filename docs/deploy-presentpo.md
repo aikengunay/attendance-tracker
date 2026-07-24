@@ -16,7 +16,7 @@ Class day does **not** use a teacher AP or laptop SQLite.
    - Root = this project
    - Build: `npx prisma migrate deploy && npm run build` (Nixpacks already runs `npm ci`; do not re-run it)
    - Start: `npm run start`
-   - Prefer Nixpacks (default via `railway.toml`). Local Docker image lives at `docker/Dockerfile`.
+   - Prefer Nixpacks (default via `railway.toml`). No app Dockerfile required.
 4. Set env vars on the service:
 
 | Variable | Value |
@@ -87,11 +87,7 @@ npm run dev
 
 `DATABASE_URL` in `.env.example` matches either path (`presentpo` / `presentpo` @ `127.0.0.1:5432`).
 
-Full stack via Compose:
-
-```bash
-docker compose up --build
-```
+Compose in this repo is **Postgres only** (`docker compose up -d db`). Run the Next app with `npm run dev` locally or via Railway in production.
 
 ## Alternatives (same shape)
 
@@ -99,7 +95,7 @@ docker compose up --build
 |------|--------|
 | **Fly.io** | `fly launch` + Fly Postgres; CF CNAME to Fly app |
 | **Render** | Web service + Postgres; CF CNAME |
-| **VPS + Cloudflare Tunnel** | Run Docker Compose on a VPS; tunnel hostname `presentpo.com` — no open origin ports |
+| **VPS + Cloudflare Tunnel** | Run Node + Postgres on a VPS; tunnel hostname `presentpo.com` — no open origin ports |
 
 Do **not** rely on the teacher laptop + AP for production.
 
