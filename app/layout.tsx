@@ -25,7 +25,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "presentpo",
+  title: {
+    default: "PresentPo",
+    template: "%s · PresentPo",
+  },
   description: "Classroom QR attendance for CTADWEBL sections",
 };
 
