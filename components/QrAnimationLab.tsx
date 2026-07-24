@@ -12,7 +12,9 @@ const GlowCard = dynamic(
   { ssr: false },
 );
 
-const DEMO_PAYLOAD = "https://presentpo.com/join?token=lab-demo-not-real";
+/** Length matches production opaque tokens (~43 chars) for realistic module density. */
+const DEMO_PAYLOAD =
+  "lab-demo-opaque-token-not-real-xxxxxxxxxxxxxxxxx";
 
 /** Match JoinConfirmTicket production QR size. */
 const QR_SIZE = 240;

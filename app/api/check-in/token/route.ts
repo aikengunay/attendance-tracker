@@ -18,16 +18,22 @@ export async function POST(req: Request) {
       body.studentId ?? "",
     );
 
-    const origin = new URL(req.url).origin;
-    const qrPayload = `${origin}/join?token=${encodeURIComponent(issued.token)}`;
-
+    // Opaque token only — station scanner accepts raw tokens (and legacy URL form).
     return NextResponse.json({
       ok: true,
       ...issued,
-      qrPayload,
+      qrPayload: issued.token,
     });
   } catch (err) {
-    const code = (err as { code?: string }).code ?? "TOKEN_FAILED";
+    const e = err as {
+      code?: string;
+      codeMark?: number;
+      name?: string;
+      studentId?: string;
+      sectionCode?: string;
+      label?: string;
+    };
+    const code = e.code ?? "TOKEN_FAILED";
     const message = err instanceof Error ? err.message : "Could not issue token";
     const status =
       code === "NOT_IN_SECTION" ||
@@ -35,6 +41,22 @@ export async function POST(req: Request) {
       code === "ALREADY_CHECKED_IN"
         ? 409
         : 400;
+
+    if (code === "ALREADY_CHECKED_IN") {
+      return NextResponse.json(
+        {
+          error: code,
+          message,
+          codeMark: e.codeMark,
+          name: e.name,
+          studentId: e.studentId,
+          sectionCode: e.sectionCode,
+          label: e.label,
+        },
+        { status },
+      );
+    }
+
     return NextResponse.json({ error: code, message }, { status });
   }
 }

@@ -1,7 +1,10 @@
 "use server";
 
 import { prisma } from "@/lib/db";
-import { lookupStudent } from "@/lib/session/checkin";
+import {
+  getOpenSessionCheckInReceipt,
+  lookupStudent,
+} from "@/lib/session/checkin";
 import { redirect } from "next/navigation";
 
 function joinRedirect(params: Record<string, string>): never {
@@ -10,6 +13,23 @@ function joinRedirect(params: Record<string, string>): never {
     if (v) qs.set(k, v);
   }
   redirect(`/join?${qs.toString()}`);
+}
+
+function doneRedirect(receipt: {
+  code: number;
+  label: string;
+  name: string;
+  studentId: string;
+  sectionCode: string;
+}): never {
+  const qs = new URLSearchParams({
+    code: String(receipt.code),
+    label: receipt.label,
+    name: receipt.name,
+    studentId: receipt.studentId,
+    sectionCode: receipt.sectionCode,
+  });
+  redirect(`/join/done?${qs.toString()}`);
 }
 
 export async function lookupStudentAction(formData: FormData) {
@@ -33,6 +53,15 @@ export async function lookupStudentAction(formData: FormData) {
       sectionCode,
       studentId,
     });
+  }
+
+  const already = await getOpenSessionCheckInReceipt(
+    prisma,
+    student.section.code,
+    student.studentId,
+  );
+  if (already) {
+    doneRedirect(already);
   }
 
   joinRedirect({

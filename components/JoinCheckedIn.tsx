@@ -9,6 +9,10 @@ import {
   type AttendanceCode,
 } from "@/lib/attendance-copy";
 import { fireCheckInConfetti } from "@/lib/success-confetti";
+import {
+  clearAllJoinTickets,
+  clearJoinTicket,
+} from "@/lib/join-ticket-storage";
 import Link from "next/link";
 import { useEffect } from "react";
 
@@ -81,6 +85,17 @@ export function JoinCheckedIn({
     if (parsed) fireCheckInConfetti(parsed);
   }, [celebrate, code]);
 
+  useEffect(() => {
+    // Prefer precise clear when ids are known; otherwise wipe all ticket keys.
+    const params = new URLSearchParams(
+      typeof window !== "undefined" ? window.location.search : "",
+    );
+    const section = params.get("sectionCode");
+    const sid = params.get("studentId");
+    if (section && sid) clearJoinTicket(section, sid);
+    else clearAllJoinTickets();
+  }, []);
+
   return (
     <div className="flex min-h-[calc(100svh-2rem)] w-full max-w-sm flex-col md:min-h-[calc(100svh-5rem)]">
       <div className="flex flex-1 flex-col items-center justify-center gap-6 py-4">
@@ -91,7 +106,7 @@ export function JoinCheckedIn({
         size="lg"
         className="w-full shrink-0 sm:w-auto sm:self-center sm:px-8"
         nativeButton={false}
-        render={<Link href="/join" />}
+        render={<Link href="/" />}
       >
         Done
       </Button>

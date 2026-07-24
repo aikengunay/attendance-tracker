@@ -11,6 +11,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useResponsiveQrTile } from "@/hooks/use-responsive-qr-size";
+import {
+  clearJoinTicket,
+  loadJoinTicket,
+  saveJoinTicket,
+} from "@/lib/join-ticket-storage";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
@@ -56,7 +61,6 @@ function shortCourseCode(subjectName: string): string {
   if (raw.includes(":")) {
     return raw.split(":")[0]?.trim() ?? "";
   }
-  // No colon — only keep compact codes, never a long title.
   if (raw.length <= 16 && !/\s/.test(raw)) return raw;
   return "";
 }
@@ -78,6 +82,27 @@ function formatSessionWhere(
   return parts.join(" · ").toUpperCase();
 }
 
+function goToDone(
+  router: ReturnType<typeof useRouter>,
+  receipt: {
+    code: string | number;
+    label?: string;
+    name: string;
+    studentId: string;
+    sectionCode: string;
+  },
+) {
+  clearJoinTicket(receipt.sectionCode, receipt.studentId);
+  const qs = new URLSearchParams({
+    code: String(receipt.code ?? ""),
+    label: receipt.label ?? "",
+    name: receipt.name,
+    studentId: receipt.studentId,
+    sectionCode: receipt.sectionCode,
+  });
+  router.replace(`/join/done?${qs.toString()}`);
+}
+
 export function JoinConfirmTicket({
   sectionCode,
   studentId,
@@ -94,6 +119,40 @@ export function JoinConfirmTicket({
   const [ticket, setTicket] = useState<TicketData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [resuming, setResuming] = useState(true);
+
+  const applyIssuedTicket = useCallback(
+    (data: {
+      token: string;
+      qrPayload?: string;
+      expiresAt: string;
+      name: string;
+      studentId: string;
+      sectionCode: string;
+      subjectName: string;
+      meetingStartAt: string;
+      meetingEndAt: string;
+      room: string | null;
+    }) => {
+      const qrPayload = data.qrPayload || data.token;
+      saveJoinTicket(data.sectionCode, data.studentId, {
+        token: data.token,
+        expiresAt: data.expiresAt,
+      });
+      setTicket({
+        token: data.token,
+        qrPayload,
+        name: data.name,
+        studentId: data.studentId,
+        sectionCode: data.sectionCode,
+        subjectName: data.subjectName,
+        meetingStartAt: data.meetingStartAt,
+        meetingEndAt: data.meetingEndAt,
+        room: data.room,
+      });
+    },
+    [],
+  );
 
   const issueTicket = useCallback(async () => {
     setBusy(true);
@@ -106,25 +165,93 @@ export function JoinConfirmTicket({
       });
       const data = await res.json();
       if (!res.ok) {
+        if (data.error === "ALREADY_CHECKED_IN" && data.codeMark) {
+          goToDone(router, {
+            code: data.codeMark,
+            label: data.label ?? "",
+            name: data.name ?? name,
+            studentId: data.studentId ?? studentId,
+            sectionCode: data.sectionCode ?? sectionCode,
+          });
+          return;
+        }
         setError(data.message || "Could not create check-in QR");
         return;
       }
-      setTicket({
-        token: data.token,
-        qrPayload: data.qrPayload,
-        name: data.name,
-        studentId: data.studentId,
-        sectionCode: data.sectionCode,
-        subjectName: data.subjectName,
-        meetingStartAt: data.meetingStartAt,
-        meetingEndAt: data.meetingEndAt,
-        room: data.room,
-      });
+      applyIssuedTicket(data);
     } catch {
       setError("Network error");
     } finally {
       setBusy(false);
     }
+  }, [sectionCode, studentId, name, router, applyIssuedTicket]);
+
+  // Resume after refresh once: already-in → done; else re-issue a fresh QR.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const stored = loadJoinTicket(sectionCode, studentId);
+      if (!stored?.token) {
+        if (!cancelled) setResuming(false);
+        return;
+      }
+      let leftForDone = false;
+      try {
+        const statusRes = await fetch(
+          `/api/check-in/status?token=${encodeURIComponent(stored.token)}`,
+          { cache: "no-store" },
+        );
+        if (cancelled) return;
+        if (statusRes.ok) {
+          const status = await statusRes.json();
+          if (status.checkedIn) {
+            leftForDone = true;
+            goToDone(router, {
+              code: status.code,
+              label: status.label ?? "",
+              name: status.name ?? name,
+              studentId: status.studentId ?? studentId,
+              sectionCode: status.sectionCode ?? sectionCode,
+            });
+            return;
+          }
+        }
+
+        const res = await fetch("/api/check-in/token", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sectionCode, studentId }),
+        });
+        const data = await res.json();
+        if (cancelled) return;
+        if (!res.ok) {
+          if (data.error === "ALREADY_CHECKED_IN" && data.codeMark) {
+            leftForDone = true;
+            goToDone(router, {
+              code: data.codeMark,
+              label: data.label ?? "",
+              name: data.name ?? name,
+              studentId: data.studentId ?? studentId,
+              sectionCode: data.sectionCode ?? sectionCode,
+            });
+            return;
+          }
+          clearJoinTicket(sectionCode, studentId);
+          setError(data.message || "Could not restore check-in QR");
+          return;
+        }
+        applyIssuedTicket(data);
+      } catch {
+        clearJoinTicket(sectionCode, studentId);
+      } finally {
+        if (!cancelled && !leftForDone) setResuming(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // Mount / identity only — avoid re-issue loops.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sectionCode, studentId]);
 
   useEffect(() => {
@@ -139,12 +266,13 @@ export function JoinConfirmTicket({
         if (!res.ok || cancelled) return;
         const data = await res.json();
         if (data.checkedIn) {
-          const qs = new URLSearchParams({
-            code: String(data.code ?? ""),
+          goToDone(router, {
+            code: data.code ?? "",
             label: data.label ?? "",
             name: data.name ?? ticket.name,
+            studentId: data.studentId ?? ticket.studentId,
+            sectionCode: data.sectionCode ?? ticket.sectionCode,
           });
-          router.replace(`/join/done?${qs.toString()}`);
         }
       } catch {
         /* ignore */
@@ -155,6 +283,14 @@ export function JoinConfirmTicket({
       clearInterval(id);
     };
   }, [ticket, router]);
+
+  if (resuming) {
+    return (
+      <div className="flex w-full max-w-sm flex-col items-center gap-3 py-16">
+        <p className="text-sm text-muted-foreground">Preparing your check-in…</p>
+      </div>
+    );
+  }
 
   if (ticket) {
     const when = formatSessionWhen(

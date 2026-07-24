@@ -18,8 +18,9 @@ function labelFor(code: 1 | 2 | 3 | 4): string {
   return studentStatusFor(code).detail;
 }
 
+/** ~43 chars — keeps QR module density similar to the old join URL payload. */
 export function newCheckInTokenValue(): string {
-  return randomBytes(9).toString("base64url");
+  return randomBytes(32).toString("base64url");
 }
 
 export async function lookupStudent(
@@ -68,6 +69,51 @@ export type IssuePersonalTokenResult = {
   room: string | null;
 };
 
+export type AlreadyCheckedInReceipt = {
+  code: 1 | 2 | 3 | 4;
+  label: string;
+  name: string;
+  studentId: string;
+  sectionCode: string;
+};
+
+/** If student already has code 1–4 on the section's open session, return receipt fields. */
+export async function getOpenSessionCheckInReceipt(
+  prisma: PrismaClient,
+  sectionCode: string,
+  studentIdRaw: string,
+): Promise<AlreadyCheckedInReceipt | null> {
+  const student = await lookupStudent(prisma, sectionCode, studentIdRaw);
+  if (!student) return null;
+
+  const session = await prisma.session.findFirst({
+    where: {
+      status: "open",
+      meeting: { sectionId: student.section.id },
+    },
+  });
+  if (!session) return null;
+
+  const attendance = await prisma.attendance.findUnique({
+    where: {
+      sessionId_studentId: {
+        sessionId: session.id,
+        studentId: student.id,
+      },
+    },
+  });
+  if (!attendance || attendance.code <= 0) return null;
+
+  const code = attendance.code as 1 | 2 | 3 | 4;
+  return {
+    code,
+    label: labelFor(code),
+    name: student.name,
+    studentId: student.studentId,
+    sectionCode: student.section.code,
+  };
+}
+
 /** Issue (or refresh) a personal QR token for the open session of this section. */
 export async function issuePersonalToken(
   prisma: PrismaClient,
@@ -107,9 +153,14 @@ export async function issuePersonalToken(
     },
   });
   if (existingAttendance && existingAttendance.code > 0) {
+    const code = existingAttendance.code as 1 | 2 | 3 | 4;
     throw Object.assign(new Error("Already checked in for this session"), {
       code: "ALREADY_CHECKED_IN",
-      codeMark: existingAttendance.code,
+      codeMark: code,
+      name: student.name,
+      studentId: student.studentId,
+      sectionCode: student.section.code,
+      label: labelFor(code),
     });
   }
 
