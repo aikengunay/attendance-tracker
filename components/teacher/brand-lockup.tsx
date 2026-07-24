@@ -29,10 +29,10 @@ export function BrandLockup({
   return (
     <Link
       href={href}
-      className={cn("flex items-center gap-2.5 font-brand", className)}
+      className={cn("flex items-center gap-1.5 font-brand", className)}
     >
       <img
-        src="/brand/brand.svg"
+        src="/brand/brand.png"
         alt=""
         width={styles.markPx}
         height={styles.markPx}

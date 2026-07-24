@@ -26,7 +26,7 @@ export function StyledCheckInQr({
       height: size,
       type: "svg",
       data,
-      image: "/brand/brand.svg",
+      image: "/brand/brand.png",
       margin: 8,
       qrOptions: {
         errorCorrectionLevel: "H",
@@ -48,8 +48,8 @@ export function StyledCheckInQr({
       },
       imageOptions: {
         crossOrigin: "anonymous",
-        margin: 6,
-        imageSize: 0.28,
+        margin: 4,
+        imageSize: 0.295,
         hideBackgroundDots: true,
       },
     });
