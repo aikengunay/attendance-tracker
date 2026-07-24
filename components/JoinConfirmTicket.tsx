@@ -49,6 +49,35 @@ function formatSessionWhen(startIso: string, endIso: string): string {
   return `${day.toUpperCase()}, ${t0.toUpperCase()} – ${t1.toUpperCase()}`;
 }
 
+/** Short course from registrar titles like `CTADWEBL: ADVANCED WEB…`. */
+function shortCourseCode(subjectName: string): string {
+  const raw = subjectName.trim();
+  if (!raw) return "";
+  if (raw.includes(":")) {
+    return raw.split(":")[0]?.trim() ?? "";
+  }
+  // No colon — only keep compact codes, never a long title.
+  if (raw.length <= 16 && !/\s/.test(raw)) return raw;
+  return "";
+}
+
+/** Section first, then short course, then room — no full subject title. */
+function formatSessionWhere(
+  sectionCode: string,
+  subjectName: string,
+  room?: string | null,
+): string {
+  const parts: string[] = [];
+  for (const raw of [sectionCode, shortCourseCode(subjectName), room]) {
+    const part = raw?.trim();
+    if (!part) continue;
+    const upper = part.toUpperCase();
+    if (parts.some((p) => p.toUpperCase() === upper)) continue;
+    parts.push(part);
+  }
+  return parts.join(" · ").toUpperCase();
+}
+
 export function JoinConfirmTicket({
   sectionCode,
   studentId,
@@ -132,17 +161,16 @@ export function JoinConfirmTicket({
       ticket.meetingStartAt,
       ticket.meetingEndAt,
     );
-    const where = [ticket.sectionCode, ticket.subjectName, ticket.room]
-      .filter(Boolean)
-      .join(" · ")
-      .toUpperCase();
+    const where = formatSessionWhere(
+      ticket.sectionCode,
+      ticket.subjectName,
+      ticket.room,
+    );
 
     return (
       <div className="flex min-h-[calc(100svh-2rem)] w-full max-w-sm flex-col md:min-h-[calc(100svh-5rem)]">
         <div className="flex flex-1 flex-col items-center justify-center gap-5 py-4 sm:gap-8">
-          <BrandLockup className="self-center" size="lg" />
-
-          <div className="space-y-1 text-center">
+          <div className="space-y-1.5 text-center">
             <p className="text-xs font-semibold tracking-[0.14em] text-foreground">
               {when}
             </p>
@@ -158,8 +186,8 @@ export function JoinConfirmTicket({
             borderRadius={qrTile.radius}
           />
 
-          <div className="space-y-1 text-center">
-            <p className="text-lg font-semibold tracking-wide uppercase">
+          <div className="space-y-1.5 text-center">
+            <p className="text-base font-semibold tracking-wide uppercase sm:text-lg">
               {ticket.name}
             </p>
             <p className="font-mono text-xs text-muted-foreground">
@@ -172,9 +200,9 @@ export function JoinConfirmTicket({
         </div>
 
         <Button
-          variant="ghost"
+          variant="outline"
           size="lg"
-          className="w-full shrink-0 text-muted-foreground"
+          className="w-full shrink-0 sm:w-auto sm:self-center sm:px-8"
           nativeButton={false}
           render={<Link href="/join" />}
         >
@@ -201,8 +229,7 @@ export function JoinConfirmTicket({
               {studentId}
             </p>
             <p className="mt-2 text-sm text-muted-foreground">
-              {sectionCode}
-              {subjectName ? ` · ${subjectName}` : ""}
+              {formatSessionWhere(sectionCode, subjectName)}
             </p>
           </div>
           {error ? (
