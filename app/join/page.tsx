@@ -34,7 +34,7 @@ export default async function JoinPage({ searchParams }: Props) {
   const subjectName = sp.subjectName ?? "";
 
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-muted p-6 md:p-10">
+    <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-muted p-4 md:p-10">
       {error ? (
         <p className="w-full max-w-sm rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
           {error}

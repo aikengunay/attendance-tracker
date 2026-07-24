@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useResponsiveQrTile } from "@/hooks/use-responsive-qr-size";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
@@ -60,6 +61,7 @@ export function JoinConfirmTicket({
   subjectName: string;
 }) {
   const router = useRouter();
+  const qrTile = useResponsiveQrTile();
   const [ticket, setTicket] = useState<TicketData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -136,29 +138,48 @@ export function JoinConfirmTicket({
       .toUpperCase();
 
     return (
-      <div className="flex w-full max-w-sm flex-col items-center gap-8">
-        <BrandLockup className="self-center" size="lg" />
+      <div className="flex min-h-[calc(100svh-2rem)] w-full max-w-sm flex-col md:min-h-[calc(100svh-5rem)]">
+        <div className="flex flex-1 flex-col items-center justify-center gap-5 py-4 sm:gap-8">
+          <BrandLockup className="self-center" size="lg" />
 
-        <div className="space-y-1 text-center">
-          <p className="text-xs font-semibold tracking-[0.14em] text-foreground">
-            {when}
-          </p>
-          <p className="text-xs tracking-wide text-muted-foreground">{where}</p>
+          <div className="space-y-1 text-center">
+            <p className="text-xs font-semibold tracking-[0.14em] text-foreground">
+              {when}
+            </p>
+            <p className="text-xs tracking-wide text-muted-foreground">
+              {where}
+            </p>
+          </div>
+
+          <PulsingQrTile
+            data={ticket.qrPayload}
+            size={qrTile.size}
+            padding={qrTile.padding}
+            borderRadius={qrTile.radius}
+          />
+
+          <div className="space-y-1 text-center">
+            <p className="text-lg font-semibold tracking-wide uppercase">
+              {ticket.name}
+            </p>
+            <p className="font-mono text-xs text-muted-foreground">
+              {ticket.studentId}
+            </p>
+            <p className="pt-2 text-sm text-muted-foreground">
+              Waiting for teacher to scan…
+            </p>
+          </div>
         </div>
 
-        <PulsingQrTile data={ticket.qrPayload} size={240} />
-
-        <div className="space-y-1 text-center">
-          <p className="text-lg font-semibold tracking-wide uppercase">
-            {ticket.name}
-          </p>
-          <p className="font-mono text-xs text-muted-foreground">
-            {ticket.studentId}
-          </p>
-          <p className="pt-2 text-sm text-muted-foreground">
-            Waiting for teacher to scan…
-          </p>
-        </div>
+        <Button
+          variant="ghost"
+          size="lg"
+          className="w-full shrink-0 text-muted-foreground"
+          nativeButton={false}
+          render={<Link href="/join" />}
+        >
+          Cancel
+        </Button>
       </div>
     );
   }

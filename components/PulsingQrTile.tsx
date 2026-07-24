@@ -3,16 +3,22 @@
 import { StyledCheckInQr } from "@/components/StyledCheckInQr";
 import { BorderBeam } from "border-beam";
 
-const TILE_RADIUS = 20;
+const DEFAULT_SIZE = 240;
+const DEFAULT_PAD = 20;
 
 /** Shared lively border-beam pulse around the student check-in QR tile. */
 export function PulsingQrTile({
   data,
-  size = 240,
+  size = DEFAULT_SIZE,
+  padding = DEFAULT_PAD,
+  borderRadius = DEFAULT_PAD,
   className,
 }: {
   data: string;
   size?: number;
+  /** White matte around the QR — scale down with `size` on small phones. */
+  padding?: number;
+  borderRadius?: number;
   className?: string;
 }) {
   return (
@@ -24,13 +30,14 @@ export function PulsingQrTile({
       strength={1}
       brightness={2.1}
       saturation={2.2}
-      borderRadius={TILE_RADIUS}
+      borderRadius={borderRadius}
       className={className}
     >
       <div
-        className="bg-white p-5"
+        className="bg-white"
         style={{
-          borderRadius: TILE_RADIUS,
+          padding,
+          borderRadius,
           boxShadow:
             "0 4px 24px oklch(0.55 0.12 240 / 0.12), 0 1px 2px oklch(0 0 0 / 0.04)",
         }}
