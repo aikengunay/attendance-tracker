@@ -1,7 +1,7 @@
 import type { PrismaClient } from "@/lib/generated/prisma/client";
 import { studentStatusFor } from "@/lib/attendance-copy";
 import { scoreCheckIn } from "@/lib/scoring";
-import { personalTokenTtlSeconds } from "@/lib/time";
+import { classWindowForMeeting, personalTokenTtlSeconds } from "@/lib/time";
 import { randomBytes } from "node:crypto";
 
 export type CheckInSuccess = {
@@ -191,6 +191,8 @@ export async function issuePersonalToken(
     session.meeting.template?.roomType ??
     session.meeting.title;
 
+  const window = classWindowForMeeting(session.meeting);
+
   return {
     token,
     expiresAt: expiresAt.toISOString(),
@@ -200,8 +202,8 @@ export async function issuePersonalToken(
     sectionCode: student.section.code,
     subjectName: student.section.subjectName,
     termLabel: student.section.termLabel,
-    meetingStartAt: session.meeting.startAt.toISOString(),
-    meetingEndAt: session.meeting.endAt.toISOString(),
+    meetingStartAt: window.start.toISOString(),
+    meetingEndAt: window.end.toISOString(),
     room,
   };
 }

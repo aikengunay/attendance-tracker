@@ -2,6 +2,7 @@
 
 import { BrandLockup } from "@/components/teacher/brand-lockup";
 import { PulsingQrTile } from "@/components/PulsingQrTile";
+import { TicketReassureLine } from "@/components/TicketReassureLine";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -306,11 +307,12 @@ export function JoinConfirmTicket({
     return (
       <div className="flex min-h-[calc(100svh-2rem)] w-full max-w-sm flex-col md:min-h-[calc(100svh-5rem)]">
         <div className="flex flex-1 flex-col items-center justify-center gap-5 py-4 sm:gap-8">
-          <div className="space-y-1.5 text-center">
-            <p className="text-xs font-semibold tracking-[0.14em] text-foreground">
+          {/* Context — quiet; never competes with QR / name */}
+          <div className="space-y-1 text-center">
+            <p className="text-[11px] font-medium tracking-[0.12em] text-muted-foreground sm:text-xs">
               {when}
             </p>
-            <p className="text-xs tracking-wide text-muted-foreground">
+            <p className="text-[11px] tracking-wide text-muted-foreground/80 sm:text-xs">
               {where}
             </p>
           </div>
@@ -322,16 +324,17 @@ export function JoinConfirmTicket({
             borderRadius={qrTile.radius}
           />
 
-          <div className="space-y-1.5 text-center">
-            <p className="text-base font-semibold tracking-wide uppercase sm:text-lg">
-              {ticket.name}
-            </p>
-            <p className="font-mono text-xs text-muted-foreground">
-              {ticket.studentId}
-            </p>
-            <p className="pt-2 text-sm text-muted-foreground">
-              Waiting for teacher to scan…
-            </p>
+          {/* Identity — strongest text after the QR */}
+          <div className="flex flex-col items-center gap-3 text-center">
+            <div className="space-y-1">
+              <p className="text-lg font-semibold tracking-wide uppercase sm:text-xl">
+                {ticket.name}
+              </p>
+              <p className="font-mono text-xs text-muted-foreground">
+                {ticket.studentId}
+              </p>
+            </div>
+            <TicketReassureLine />
           </div>
         </div>
 

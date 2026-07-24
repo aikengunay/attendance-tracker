@@ -201,11 +201,45 @@
   animation: presentpo-check-ring 0.7s ease-out both;
 }
 
+/* Ticket waiting reassurance — soft crossfade + rise (not stage changes) */
+@keyframes presentpo-ticket-reassure-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes presentpo-ticket-reassure-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+.presentpo-ticket-reassure-in {
+  animation: presentpo-ticket-reassure-in 420ms cubic-bezier(0.22, 1, 0.36, 1)
+    both;
+}
+
+.presentpo-ticket-reassure-out {
+  animation: presentpo-ticket-reassure-out 420ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .presentpo-qr-tile,
   .presentpo-qr-ring,
   .presentpo-check-pop,
-  .presentpo-check-ring {
+  .presentpo-check-ring,
+  .presentpo-ticket-reassure-in,
+  .presentpo-ticket-reassure-out {
     animation: none;
   }
 }

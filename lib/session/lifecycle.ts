@@ -90,13 +90,29 @@ export async function startSession(prisma: PrismaClient, input: StartSessionInpu
     } else if (!existingMeeting.session) {
       meetingId = existingMeeting.id;
     } else {
-      // Prior closed session owns this meeting row — create a new meeting instance.
+      // Prior closed session owns this meeting row — new instance.
+      // Keep the scheduled class window (not openedAt→afternoon), and nudge
+      // startAt by seconds so @@unique([sectionId, date, startAt]) stays happy.
+      let uniqueStart = scheduledStart;
+      for (let n = 1; n <= 120; n++) {
+        const clash = await tx.meeting.findUnique({
+          where: {
+            sectionId_date_startAt: {
+              sectionId: section.id,
+              date: meetingDate,
+              startAt: uniqueStart,
+            },
+          },
+        });
+        if (!clash) break;
+        uniqueStart = new Date(scheduledStart.getTime() + n * 1000);
+      }
       const created = await tx.meeting.create({
         data: {
           sectionId: section.id,
           templateId: template?.id ?? null,
           date: meetingDate,
-          startAt: openedAt,
+          startAt: uniqueStart,
           endAt: scheduledEnd,
           title: title ? `${title} (retake)` : "Retake",
         },

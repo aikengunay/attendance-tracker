@@ -83,4 +83,43 @@ describe("session lifecycle", () => {
     expect(absent?.code).toBe(0);
     expect(absent?.source).toBe("auto");
   });
+
+  it("retake keeps scheduled class window (not openedAt → afternoon end)", async () => {
+    const open = await prisma.session.findFirst({
+      where: { status: "open", meeting: { sectionId } },
+    });
+    if (open) await endSession(prisma, open.id);
+
+    await startSession(prisma, { sectionId, templateId, t0Mode: "now" });
+    const first = await prisma.session.findFirstOrThrow({
+      where: { status: "open", meeting: { sectionId } },
+    });
+    await endSession(prisma, first.id);
+
+    const retake = await startSession(prisma, {
+      sectionId,
+      templateId,
+      t0Mode: "now",
+    });
+    const startHm = retake.meeting.startAt.toLocaleTimeString("en-GB", {
+      timeZone: "Asia/Manila",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+    const endHm = retake.meeting.endAt.toLocaleTimeString("en-GB", {
+      timeZone: "Asia/Manila",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+    expect(startHm).toBe("13:00");
+    expect(endHm).toBe("15:40");
+    expect(retake.meeting.endAt.getTime()).toBeGreaterThan(
+      retake.meeting.startAt.getTime(),
+    );
+
+    await endSession(prisma, retake.session.id);
+  });
 });
+
