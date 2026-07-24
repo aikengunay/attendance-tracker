@@ -1,5 +1,6 @@
 "use client";
 
+import { BrandLockup } from "@/components/teacher/brand-lockup";
 import { TeacherNavMain } from "@/components/teacher/nav-main";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,8 +13,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { skipAutoPasskeyOnce } from "@/lib/passkey-client";
-import { BookOpenIcon, LogOutIcon, UploadIcon } from "lucide-react";
-import Link from "next/link";
+import { BookOpenIcon, LogOutIcon, SettingsIcon } from "lucide-react";
 
 const navItems = [
   {
@@ -22,9 +22,9 @@ const navItems = [
     icon: <BookOpenIcon />,
   },
   {
-    title: "Import",
-    url: "/teacher/import",
-    icon: <UploadIcon />,
+    title: "Settings",
+    url: "/teacher/settings",
+    icon: <SettingsIcon />,
   },
 ];
 
@@ -44,12 +44,8 @@ export function TeacherAppSidebar({
           <SidebarMenuItem>
             <SidebarMenuButton
               className="data-[slot=sidebar-menu-button]:p-1.5!"
-              render={<Link href="/teacher" />}
-            >
-              <span className="text-base font-semibold tracking-tight">
-                presentpo
-              </span>
-            </SidebarMenuButton>
+              render={<BrandLockup href="/teacher" />}
+            />
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>

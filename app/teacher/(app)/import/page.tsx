@@ -1,5 +1,16 @@
 "use client";
 
+import { TeacherPageHeader } from "@/components/teacher/page-header";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 
@@ -87,88 +98,92 @@ export default function ImportPage() {
   }
 
   return (
-    <main className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Import classlist</h1>
-        <p className="mt-1 text-sm text-zinc-600">
-          Upload Registrar TSV <code>.xls</code> (INF231 / INF232). Preview, then
-          confirm to upsert.
-        </p>
-      </div>
+    <>
+      <TeacherPageHeader
+        title="Import classlist"
+        description="Upload Registrar TSV .xls (INF231 / INF232). Preview, then confirm to upsert."
+      />
 
-      <form
-        onSubmit={onPreview}
-        className="flex flex-col gap-3 rounded border border-zinc-200 bg-white p-4"
-      >
-        <label className="text-sm text-zinc-600" htmlFor="file">
-          Classlist file
-        </label>
-        <input
-          id="file"
-          name="file"
-          type="file"
-          accept=".xls,.tsv,.txt,text/plain,text/tab-separated-values"
-          required
-          className="text-sm"
-        />
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-fit rounded bg-zinc-900 px-3 py-2 text-sm font-medium text-white disabled:opacity-60"
-        >
-          {loading && !preview ? "Parsing…" : "Preview"}
-        </button>
-      </form>
+      <Card>
+        <CardHeader>
+          <CardTitle>Upload file</CardTitle>
+          <CardDescription>
+            Accepts .xls / .tsv from the Registrar export.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={onPreview} className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="file">Classlist file</Label>
+              <Input
+                id="file"
+                name="file"
+                type="file"
+                accept=".xls,.tsv,.txt,text/plain,text/tab-separated-values"
+                required
+              />
+            </div>
+            <Button type="submit" disabled={loading} className="w-fit">
+              {loading && !preview ? "Parsing…" : "Preview"}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
 
-      {error ? <p className="text-sm text-red-600">{error}</p> : null}
+      {error ? <p className="text-sm text-destructive">{error}</p> : null}
 
       {preview ? (
-        <section className="flex flex-col gap-4 rounded border border-zinc-200 bg-white p-4">
-          <div>
-            <p className="text-lg font-medium">{preview.sectionCode}</p>
-            <p className="text-sm text-zinc-600">{preview.subjectName}</p>
-            <p className="text-xs text-zinc-500">{preview.termLabel}</p>
-            <p className="mt-2 text-sm text-zinc-700">
+        <Card>
+          <CardHeader>
+            <CardTitle>{preview.sectionCode}</CardTitle>
+            <CardDescription>
+              {preview.subjectName} · {preview.termLabel}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-4">
+            <p className="text-sm text-muted-foreground">
               {preview.studentCount} students · {preview.scheduleCount} schedules
-              {preview.classLimit != null ? ` · limit ${preview.classLimit}` : ""}
+              {preview.classLimit != null
+                ? ` · limit ${preview.classLimit}`
+                : ""}
             </p>
-          </div>
 
-          <div>
-            <h2 className="text-sm font-medium text-zinc-800">Schedules</h2>
-            <ul className="mt-1 space-y-1 text-sm text-zinc-600">
-              {preview.schedules.map((s, i) => (
-                <li key={i}>
-                  {s.dayLabel} {s.startTime}–{s.endTime}
-                  {s.roomType ? ` · ${s.roomType}` : ""}
-                  {s.room ? ` · ${s.room}` : ""}
-                </li>
-              ))}
-            </ul>
-          </div>
+            <div>
+              <h2 className="text-sm font-medium">Schedules</h2>
+              <ul className="mt-1 space-y-1 text-sm text-muted-foreground">
+                {preview.schedules.map((s, i) => (
+                  <li key={i}>
+                    {s.dayLabel} {s.startTime}–{s.endTime}
+                    {s.roomType ? ` · ${s.roomType}` : ""}
+                    {s.room ? ` · ${s.room}` : ""}
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-          <div>
-            <h2 className="text-sm font-medium text-zinc-800">Sample students</h2>
-            <ul className="mt-1 space-y-1 text-sm text-zinc-600">
-              {preview.sampleStudents.map((s) => (
-                <li key={s.studentId}>
-                  {s.studentId} — {s.name}
-                  {s.status ? ` (${s.status})` : ""}
-                </li>
-              ))}
-            </ul>
-          </div>
+            <div>
+              <h2 className="text-sm font-medium">Sample students</h2>
+              <ul className="mt-1 space-y-1 text-sm text-muted-foreground">
+                {preview.sampleStudents.map((s) => (
+                  <li key={s.studentId}>
+                    {s.studentId} — {s.name}
+                    {s.status ? ` (${s.status})` : ""}
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-          <button
-            type="button"
-            onClick={onCommit}
-            disabled={loading}
-            className="w-fit rounded bg-zinc-900 px-3 py-2 text-sm font-medium text-white disabled:opacity-60"
-          >
-            {loading ? "Saving…" : "Confirm import"}
-          </button>
-        </section>
+            <Button
+              type="button"
+              onClick={onCommit}
+              disabled={loading}
+              className="w-fit"
+            >
+              {loading ? "Saving…" : "Confirm import"}
+            </Button>
+          </CardContent>
+        </Card>
       ) : null}
-    </main>
+    </>
   );
 }

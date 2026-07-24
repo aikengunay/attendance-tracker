@@ -1,12 +1,17 @@
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
-import { Figtree, Geist_Mono, Lora } from "next/font/google";
+import { Figtree, Geist_Mono, Lora, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 
 const figtree = Figtree({
   subsets: ["latin"],
   variable: "--font-figtree",
+});
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-plus-jakarta",
 });
 
 const lora = Lora({
@@ -35,6 +40,7 @@ export default function RootLayout({
       className={cn(
         "h-full antialiased font-sans",
         figtree.variable,
+        plusJakartaSans.variable,
         lora.variable,
         geistMono.variable,
       )}

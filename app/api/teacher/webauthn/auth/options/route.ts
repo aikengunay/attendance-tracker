@@ -23,7 +23,7 @@ export async function POST(req: Request) {
   if (passkeys.length === 0) {
     return jsonError(
       "NO_PASSKEYS",
-      "No passkey enrolled yet. Sign in with your password, then add one under Security.",
+      "No passkey enrolled yet. Sign in with your password, then add one under Settings.",
       400,
     );
   }

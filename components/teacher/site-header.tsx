@@ -5,6 +5,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { usePathname } from "next/navigation";
 
 function titleForPath(pathname: string): string {
+  if (pathname.startsWith("/teacher/settings")) return "Settings";
   if (pathname.startsWith("/teacher/import")) return "Import";
   if (pathname.startsWith("/teacher/sections")) return "Section";
   if (pathname.includes("/roster")) return "Roster";
@@ -13,9 +14,7 @@ function titleForPath(pathname: string): string {
   }
   if (pathname.includes("/export")) return "Export";
   if (pathname.includes("/sessions")) return "Session";
-  if (pathname === "/teacher" || pathname.startsWith("/teacher/")) {
-    return "Sections";
-  }
+  if (pathname === "/teacher") return "Sections";
   return "Teacher";
 }
 

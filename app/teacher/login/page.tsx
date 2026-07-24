@@ -1,5 +1,6 @@
 "use client";
 
+import { BrandLockup } from "@/components/teacher/brand-lockup";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -129,24 +130,18 @@ function LoginForm() {
   const showPasskey = statusLoaded && hasPasskeys;
 
   return (
-    <div className="flex min-h-svh flex-col bg-muted">
-      <header className="border-b bg-background">
-        <div className="mx-auto flex h-14 max-w-6xl items-center px-4 sm:px-6 lg:px-8">
-          <Link href="/" className="text-sm font-semibold tracking-tight">
-            presentpo
-          </Link>
-        </div>
-      </header>
+    <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-muted p-6 md:p-10">
+      <div className="flex w-full max-w-sm flex-col gap-6">
+        <BrandLockup className="self-center" size="lg" />
 
-      <main className="flex flex-1 items-center justify-center px-4 py-12 sm:px-6">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle className="text-2xl">Sign in to presentpo</CardTitle>
+        <Card>
+          <CardHeader className="text-center">
+            <CardTitle className="text-xl">Sign in</CardTitle>
             <CardDescription>
               {showPasskey
                 ? passkeyLoading
                   ? "Waiting for passkey…"
-                  : "Use your passkey, or cancel and enter your password."
+                  : "Enter your password, or use a passkey."
                 : "Teacher access for attendance sessions."}
             </CardDescription>
           </CardHeader>
@@ -180,12 +175,13 @@ function LoginForm() {
             </form>
 
             {showPasskey ? (
-              <>
-                <div className="relative my-6">
-                  <Separator />
-                  <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-3 text-xs uppercase tracking-wide text-muted-foreground">
+              <div className="mt-6 flex flex-col gap-4">
+                <div className="flex items-center gap-3">
+                  <Separator className="flex-1" />
+                  <span className="text-xs text-muted-foreground uppercase">
                     or
                   </span>
+                  <Separator className="flex-1" />
                 </div>
 
                 <Button
@@ -200,7 +196,7 @@ function LoginForm() {
                     ? "Waiting for passkey…"
                     : "Sign in with passkey"}
                 </Button>
-              </>
+              </div>
             ) : statusLoaded ? (
               <p className="mt-6 text-center text-xs text-muted-foreground">
                 First time here? After you continue, we’ll offer to set up a
@@ -209,7 +205,13 @@ function LoginForm() {
             ) : null}
           </CardContent>
         </Card>
-      </main>
+
+        <p className="text-center text-sm text-muted-foreground">
+          <Link href="/" className="underline underline-offset-4 hover:text-foreground">
+            Back to home
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }

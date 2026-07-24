@@ -1,5 +1,7 @@
 import { AddStudentForm } from "@/components/AddStudentForm";
 import { StartSessionPanel } from "@/components/StartSessionPanel";
+import { TeacherPageHeader } from "@/components/teacher/page-header";
+import { Button } from "@/components/ui/button";
 import { prisma } from "@/lib/db";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -43,27 +45,26 @@ export default async function SectionDetailPage({ params }: Props) {
 
   return (
     <main className="flex flex-col gap-8">
-      <div>
-        <p className="text-sm text-zinc-500">
+      <div className="space-y-2">
+        <p className="text-sm text-muted-foreground">
           <Link href="/teacher" className="hover:underline">
             Sections
           </Link>
           <span className="mx-1">/</span>
           {section.code}
         </p>
-        <div className="mt-2 flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">{section.code}</h1>
-            <p className="text-sm text-zinc-600">{section.subjectName}</p>
-            <p className="text-xs text-zinc-500">{section.termLabel}</p>
-          </div>
-          <Link
-            href={`/teacher/sections/${section.id}/export`}
-            className="rounded border border-zinc-300 bg-white px-3 py-2 text-sm font-medium"
-          >
-            Export gradebook
-          </Link>
-        </div>
+        <TeacherPageHeader
+          title={section.code}
+          description={`${section.subjectName} · ${section.termLabel}`}
+          actions={
+            <Button
+              variant="outline"
+              render={<Link href={`/teacher/sections/${section.id}/export`} />}
+            >
+              Export gradebook
+            </Button>
+          }
+        />
       </div>
 
       <section className="flex flex-col gap-2">

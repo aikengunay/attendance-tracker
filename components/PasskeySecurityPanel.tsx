@@ -136,7 +136,7 @@ export function PasskeySecurityPanel({
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Security</CardTitle>
+          <CardTitle>Passkeys</CardTitle>
           <CardDescription>Checking passkey support…</CardDescription>
         </CardHeader>
       </Card>
@@ -147,7 +147,7 @@ export function PasskeySecurityPanel({
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Security</CardTitle>
+          <CardTitle>Passkeys</CardTitle>
           <CardDescription>
             This browser does not expose WebAuthn. Try Chrome or Safari, or keep
             using password.
@@ -193,7 +193,7 @@ export function PasskeySecurityPanel({
       <Card>
         <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="space-y-1.5">
-            <CardTitle>Security · Passkeys</CardTitle>
+            <CardTitle>Passkeys</CardTitle>
             <CardDescription>
               Manage devices that can unlock teacher access. Password always
               remains a backup. If passkey sign-in fails, remove old keys and

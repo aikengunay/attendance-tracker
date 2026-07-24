@@ -27,7 +27,8 @@ export function TeacherNavMain({ items }: { items: TeacherNavItem[] }) {
             const isActive =
               item.url === "/teacher"
                 ? pathname === "/teacher"
-                : pathname === item.url || pathname.startsWith(`${item.url}/`);
+                : pathname === item.url ||
+                  pathname.startsWith(`${item.url}/`);
             return (
               <SidebarMenuItem key={item.url}>
                 <SidebarMenuButton
