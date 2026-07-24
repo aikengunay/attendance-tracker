@@ -56,8 +56,8 @@ export function DoneAnimationLab() {
               Done animation lab
             </h1>
             <p className="max-w-xl text-sm text-muted-foreground">
-              Fluent emoji + points copy. Confetti is full for code 1, softer for
-              2–3, and off for 4. Replay each card to re-run.
+              Three-line receipt: points (hero), encourage (personal pool),
+              status (quiet). Confetti full for 1, softer for 2–3, off for 4.
             </p>
           </div>
           <Link
